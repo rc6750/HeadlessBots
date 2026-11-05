@@ -37,14 +37,17 @@ function Timer()
 	while ( (BotsToAdd > 0) && DM.ForceAddBot() )
 		BotsToAdd--;
 	// Dedicated DeathMatchPlus waits for a human before it leaves bNetReady.
-	// While bNetReady is true its Timer returns early every second, so the
-	// time limit and the restart after a match (map rotation) never run.
-	// A human joining clears it; an all-bot server has to clear it here
-	// (2026-11-05: matches ended at the frag limit and the server sat on the
-	// end screen until restarted).
+	// Its Timer then clears bNetReady AND bRequireReady before StartMatch().
+	// Do the same here: while bNetReady is true the Timer returns early, and
+	// while bRequireReady is true (CountDown > 0) it stays in the "waiting for
+	// ready" branch. Either way it never reaches the time limit or the restart
+	// after a match (map rotation), and joining players are held in
+	// PlayerWaiting, which looks like spectating. (2026-11-05: matches ended at
+	// the frag limit and the server sat on the end screen until restarted.)
 	if ( !DM.bGameEnded )
 	{
 		DM.bNetReady = false;
+		DM.bRequireReady = false;
 		DM.StartMatch();
 	}
 	Log("HeadlessBots: requested "$DesiredBots$" bots; DeathMatchPlus has "$DM.NumBots$".");
