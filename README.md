@@ -1,6 +1,8 @@
 # HeadlessBots for UT99 469f
 
-`HeadlessBotsMut` is a DeathMatchPlus-only mutator for an unattended server. On every map load it waits for `StartupDelay`, calls `DeathMatchPlus.AddBot()` until `DesiredBots` is reached, then calls `StartMatch()` so a dedicated server does not wait for a human connection.
+`HeadlessBotsMut` is a DeathMatchPlus-only mutator for an unattended server. On every map load it waits for `StartupDelay`, calls `DeathMatchPlus.ForceAddBot()` until `DesiredBots` is reached, clears `bNetReady` and calls `StartMatch()` so a dedicated server does not wait for a human connection.
+
+Clearing `bNetReady` matters (fixed 2026-11-05): while it is true, `DeathMatchPlus.Timer` returns early every second, so with no human connected the time limit and the restart after a match never ran — a match ended at the frag limit and the server stayed on the end screen instead of rotating to the next map.
 
 It does not set `MinPlayers`, replace the game type, alter `Rainbow.RainbowArena`, or modify the map list. `DeathMatchPlus` retains normal map rotation and bot lifecycle behavior after startup.
 
